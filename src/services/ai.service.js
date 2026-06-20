@@ -89,42 +89,88 @@ const prompt = `
 Generate a structured interview report in STRICT JSON format.
 
 IMPORTANT:
-Each array must contain OBJECTS, not strings.
+matchScore must be a NUMBER between 0 and 100.
 
-Correct format example:
-technicalQuestions: [
+technicalQuestions must be:
+
+[
   {
-    "question": "...",
-    "intention": "...",
-    "answer": "..."
+    "question":"...",
+    "intention":"...",
+    "answer":"..."
+  }
+]
+
+behavioralQuestions must be:
+
+[
+  {
+    "question":"...",
+    "intention":"...",
+    "answer":"..."
+  }
+]
+
+skillGaps must be:
+
+[
+  {
+    "skill":"...",
+    "severity":"low"
+  }
+]
+
+preparationPlan must be:
+
+[
+  {
+    "day":1,
+    "focus":"...",
+    "tasks":["...","..."]
   }
 ]
 
 RULES:
-- Do NOT return key-value pairs in sequence
-- Do NOT return flat arrays
-- Always return arrays of objects
 - Return ONLY valid JSON
+- Do NOT return null
+- Do NOT return arrays of strings
+- Do NOT return explanations
+- Do NOT return key-value pairs in sequence
+- Every array item must be an object
+- matchScore must be a number
 
 Fields required:
-matchScore, technicalQuestions, behavioralQuestions, skillGaps, preparationPlan
+matchScore,
+technicalQuestions,
+behavioralQuestions,
+skillGaps,
+preparationPlan
 
 Resume: ${resume}
+
 Self Description: ${selfDescription}
+
 Job Description: ${jobDescription}
 `;
 
 
     const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents:prompt,
-        config:{
-            responseMimeType:"application/json",
-            responseJsonSchema: zodToJsonSchema(interviewReportSchema)
-        }
-    })
+    model: "gemini-2.5-flash",
+    contents: prompt,
+    config: {
+        responseMimeType: "application/json"
+    }
+})
 
-    return JSON.parse(response.text)
+   console.log("RAW RESPONSE:");
+console.log(response.text);
+
+const result = JSON.parse(response.text);
+
+console.log("RESULT:");
+console.log(result);
+
+return result;
 }
 
 module.exports = generateInterviewReport;
